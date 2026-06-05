@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A Special Pink Birthday Surprise</title>
+    <style>
+      /* Global Reset & Styling */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: linear-gradient(135deg, #fdf8f5 0%, #fae8ff 100%);
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        overflow-x: hidden;
+        padding: 20px;
+        perspective: 1000px;
+      }
+
+      /* Outer Wrapper to maintain center layout */
+      .scene {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 330px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Container for the envelope */
+      .envelope-wrapper {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #f472b6, #db2777);
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 25px 50px rgba(219, 39, 119, 0.25);
+        cursor: pointer;
+        z-index: 1;
+        transition:
+          transform 0.3s ease,
+          opacity 0.5s ease-in-out;
+      }
+
+      .envelope-wrapper:hover {
+        transform: translateY(-8px) scale(1.02);
+      }
+
+      /* Envelope Top Flap */
+      .envelope-flap {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-left: 250px solid transparent;
+        border-right: 250px solid transparent;
+        border-top: 175px solid #f9a8d4;
+        transform-origin: top;
+        transition: transform 0.5s ease-in-out;
+        z-index: 3;
+      }
+
+      /* Dynamic adjustment to keep flap precise if mobile screen sizes down below 500px */
+      @media (max-width: 540px) {
+        .scene {
+          height: 280px;
+        }
+        .envelope-flap {
+          border-left-width: 45vw;
+          border-right-width: 45vw;
+          border-top-width: 32vw;
+        }
+      }
+
+      /* Envelope Front Left/Right Cuts for Realism */
+      .envelope-wrapper::before {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background: #f472b6;
+        clip-path: polygon(0 0, 100% 50%, 0 100%);
+        border-radius: 0 0 0 12px;
+        z-index: 3;
+      }
+
+      .envelope-wrapper::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 50%;
+        height: 100%;
+        background: #ec4899;
+        clip-path: polygon(100% 0, 0 50%, 100% 100%);
+        border-radius: 0 0 12px 0;
+        z-index: 3;
+      }
+
+      /* Elegant Rose-Gold Wax Seal Button */
+      .wax-seal {
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 55px;
+        height: 55px;
+        background: linear-gradient(135deg, #fb7185, #e11d48);
+        border-radius: 50%;
+        z-index: 4;
+        box-shadow: 0 6px 15px rgba(225, 29, 72, 0.4);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        border: 2px solid #ffe4e6;
+        transition: opacity 0.3s ease;
+      }
+
+      /* The Letter Inside */
+      .letter {
+        position: absolute;
+        bottom: 15px;
+        left: 5%;
+        width: 90%;
+        height: 85%;
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        z-index: 2;
+        transition:
+          transform 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+          width 0.5s ease,
+          height 0.5s ease,
+          box-shadow 0.5s ease;
+        display: flex;
+        flex-direction: row;
+        gap: 25px;
+        align-items: center;
+      }
+
+      /* Left side: Text content */
+      .letter-text {
+        flex: 1.2;
+        text-align: left;
+        opacity: 0;
+        transition: opacity 0.4s ease 0.4s;
+      }
+
+      .letter h1 {
+        font-size: 28px;
+        background: linear-gradient(45deg, #db2777, #f43f5e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 12px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+      }
+
+      .letter p {
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.6;
+      }
+
+      /* Right side: Rectangle Picture & Milk Mocha Sticker Container */
+      .letter-photo-wrapper {
+        position: relative;
+        flex: 1;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.4s ease 0.4s;
+      }
+
+      .letter-photo {
+        width: 100%;
+        height: 100%;
+        max-height: 340px;
+        border-radius: 8px;
+        object-fit: cover;
+        box-shadow: 0 10px 25px rgba(219, 39, 119, 0.15);
+        border: 4px solid #fff5f7;
+      }
+
+      /* Milk Mocha Sticker Design overlaying the image corner */
+      .milk-mocha-sticker {
+        position: absolute;
+        bottom: -25px;
+        left: -35px;
+        width: 110px;
+        height: 110px;
+        z-index: 12;
+        animation: sticker-wiggle 3s ease-in-out infinite alternate;
+        pointer-events: none;
+      }
+
+      .milk-mocha-sticker img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+
+      /* Floating Heart Particles */
+      .heart-particle {
+        position: absolute;
+        color: #f43f5e;
+        font-size: 24px;
+        pointer-events: none;
+        z-index: 20;
+        opacity: 0;
+        animation: float-up 2.5s ease-out forwards;
+      }
+
+      /* --- Interactive Animations --- */
+      @keyframes sticker-wiggle {
+        0% {
+          transform: rotate(-6deg) scale(1);
+        }
+        100% {
+          transform: rotate(6deg) scale(1.05);
+        }
+      }
+
+      @keyframes float-up {
+        0% {
+          transform: translateY(100px) scale(0) rotate(0deg);
+          opacity: 0;
+        }
+        20% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(-280px) scale(1.2) rotate(45deg);
+          opacity: 0;
+        }
+      }
+
+      .envelope-wrapper.open .envelope-flap {
+        transform: rotateX(180deg);
+      }
+
+      .envelope-wrapper.open .wax-seal {
+        opacity: 0;
+      }
+
+      .envelope-wrapper.open .letter {
+        transform: translateY(-140px);
+      }
+
+      .envelope-wrapper.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Desktop/Tablet Center Stage */
+      .letter.center-stage {
+        position: relative;
+        left: 0;
+        bottom: 0;
+        width: 760px;
+        height: 420px;
+        transform: translateY(0) scale(1.05);
+        z-index: 10;
+        box-shadow: 0 35px 60px -15px rgba(219, 39, 119, 0.3);
+      }
+
+      .letter.center-stage .letter-text,
+      .letter.center-stage .letter-photo-wrapper {
+        opacity: 1;
+      }
+
+      /* --- Mobile Optimization Media Queries --- */
+      @media (max-width: 768px) {
+        .letter.center-stage {
+          width: 95vw;
+          max-width: 380px;
+          height: auto;
+          min-height: 540px;
+          flex-direction: column-reverse; /* Put image on top, text below on mobile */
+          gap: 20px;
+          padding: 25px;
+          transform: translateY(0) scale(1);
+        }
+
+        .letter-photo-wrapper {
+          flex: none;
+          width: 100%;
+          height: 260px;
+        }
+
+        .letter-photo {
+          max-height: 260px;
+        }
+
+        .milk-mocha-sticker {
+          bottom: -15px;
+          left: -15px;
+          width: 95px;
+          height: 95px;
+        }
+
+        .letter-text {
+          flex: none;
+          width: 100%;
+          text-align: center;
+        }
+
+        .letter h1 {
+          font-size: 24px;
+          margin-bottom: 8px;
+        }
+
+        .letter p {
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="scene">
+      <div class="envelope-wrapper" id="envelope">
+        <div class="envelope-flap"></div>
+
+        <div class="wax-seal">OPEN</div>
+
+        <div class="letter" id="letter">
+          <div class="letter-text">
+            <h1>Happy Birthday Babee</h1>
+            <p>
+              Wishing you have a wonderful birthday! happiness in your life!
+              good luck! and success in the year ahead! and may all your dreams
+              come true! I hope you have a fantastic day filled with love,
+              laughter, and unforgettable moments. You deserve all the joy in
+              the world on your special day! and finally, I want to say that I
+              love you so much and I am so grateful to have you in my life. You
+              are the best thing that ever happened to me, and this is the first
+              year that i have to celebrate many more birthdays with you. Happy
+              birthday, my love!🥰😘❤️
+            </p>
+          </div>
+
+          <div class="letter-photo-wrapper">
+            <img
+              class="letter-photo"
+              src="./img/image.png"
+              alt="Birthday Special"
+            />
+
+            <div class="milk-mocha-sticker">
+              <img
+                src="https://media.tenor.com/2b7_HdfXb78AAAAi/milk-and-mocha-bear.gif"
+                alt="Milk Mocha Bear I Love You Sticker"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const envelope = document.getElementById("envelope");
+      const letter = document.getElementById("letter");
+      const scene = document.querySelector(".scene");
+
+      // Function to dynamically spawn floating heart particles on expansion
+      function createHeartParticles() {
+        for (let i = 0; i < 15; i++) {
+          setTimeout(() => {
+            const heart = document.createElement("div");
+            heart.classList.add("heart-particle");
+            heart.innerHTML = "❤️";
+
+            heart.style.left = Math.random() * 80 + 10 + "%";
+            heart.style.bottom = "20%";
+            heart.style.animationDelay = Math.random() * 0.4 + "s";
+
+            scene.appendChild(heart);
+
+            // Clean element node out once animation ends
+            setTimeout(() => heart.remove(), 2500);
+          }, i * 150);
+        }
+      }
+
+      envelope.addEventListener("click", () => {
+        envelope.classList.add("open");
+
+        setTimeout(() => {
+          envelope.classList.add("fade-out");
+
+          setTimeout(() => {
+            scene.appendChild(letter);
+            letter.classList.add("center-stage");
+            // Triggers the magical heart cloud
+            createHeartParticles();
+          }, 300);
+        }, 800);
+      });
+    </script>
+  </body>
+</html>
